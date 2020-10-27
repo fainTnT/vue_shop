@@ -1,27 +1,34 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import Home from '../views/Home.vue'
 
 Vue.use(VueRouter)
 
 const routes = [
+  // 重定向
   {
-    path: '/',
-    name: 'Home',
-    component: Home
+    path:'/',
+    redirect:'/login'
   },
   {
-    path: '/about',
-    name: 'About',
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "about" */ '../views/About.vue')
-  }
+    path:'/login',
+    component:() => import('components/Login')
+  },
+  {
+    path:'/home',
+    component:() => import('components/Home')
+  },
 ]
 
 const router = new VueRouter({
   routes
 })
 
+// 设置导航守卫 如果没有记录token则不能进入到home
+router.beforeEach((to,from,next) => {
+  // next() 放行  next('/login')强制跳转
+  if (to.path=='/login') return next();
+  const tokenStr = window.sessionStorage.getItem('token');
+  if(!tokenStr) return next('/login')
+  next();
+})
 export default router

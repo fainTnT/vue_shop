@@ -68,7 +68,6 @@
         const {data} = await this.$http.get('/menus')
         if(data.meta.status != 200) return this.$message.error(data.meta.msg);
         this.menuList = data.data;
-        console.log(this.menuList)
       },
       // 点击切换列表的折叠
       toggleList(){

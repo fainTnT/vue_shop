@@ -29,12 +29,12 @@
         <el-table-column
           prop="username"
           label="姓名"
-          width="180">
+          >
         </el-table-column>
         <el-table-column
           prop="email"
           label="邮箱"
-          width="180">
+          >
         </el-table-column>
         <el-table-column
           prop="mobile"
@@ -64,8 +64,8 @@
             <el-tooltip class="item" effect="dark" content="删除" placement="top" :enterable="false">
               <el-button type="danger" icon="el-icon-delete" size="mini" @click="removeUser(scope.row.id)"></el-button>
             </el-tooltip>
-            <el-tooltip class="item" effect="dark" content="分配权限" placement="top" :enterable="false">
-              <el-button type="warning" icon="el-icon-setting" size="mini"></el-button>
+            <el-tooltip class="item" effect="dark" content="分配角色" placement="top" :enterable="false">
+              <el-button type="warning" icon="el-icon-setting" size="mini" @click="setRoles(scope.row)"></el-button>
             </el-tooltip>
           </template>
         </el-table-column>
@@ -122,6 +122,31 @@
           <el-button type="primary" @click="editUserForm">确 定</el-button>
         </span>
       </el-dialog>
+
+      <!--分配角色界面-->
+      <el-dialog
+        title="分配角色"
+        :visible.sync="showSetRoles"
+        width="40%"
+        @close="setRolesClose">
+        <div>当前用户：{{role.username}}</div>
+        <br>
+        <div>当前角色：{{role.rolename}}</div>
+        <br>
+        <!--选择器-->
+        <el-select  placeholder="请选择角色" v-model="roleId">
+          <el-option
+            v-for="item in allRoles"
+            :key="item.id"
+            :label="item.roleName"
+            :value="item.id">
+          </el-option>
+        </el-select>
+        <span slot="footer" class="dialog-footer">
+          <el-button @click="showSetRoles = false">取 消</el-button>
+          <el-button type="primary" @click="setRolesClick">确 定</el-button>
+        </span>
+      </el-dialog>
     </el-card>
   </div>
 </template>
@@ -140,6 +165,7 @@
         total:0,
         showAddUser: false,
         showEditUser:false,
+        showSetRoles:false,
         addUser:{
           username:'',
           password:'',
@@ -167,7 +193,14 @@
           mobile: [
             { validator: this.checkMobile, trigger: 'blur' }
           ]
-        }
+        },
+        role:{
+          id:'',
+          rolename:'',
+          username:''
+        },
+        allRoles:[],
+        roleId:''
       }
     },
     methods:{
@@ -277,6 +310,29 @@
             return callback(new Error('请输入正确手机号'));
           }
         }
+      },
+      // 分配角色
+      setRolesClose(){
+        this.showSetRoles = false
+        this.allRoles = [];
+        this.roleId = '';
+      },
+      async setRolesClick(){
+        const {data:res} = await this.$http.put(`users/${this.role.id}/role`,{rid:this.roleId});
+        if (res.meta.status !== 200) return;
+        this.$message.success('角色修改成功');
+        this.showSetRoles = false
+        this.getUserInfo();
+      },
+      async setRoles(row){
+        this.showSetRoles = true
+        this.role.id = row.id;
+        this.role.rolename = row.role_name;
+        this.role.username = row.username;
+        // 获取所有角色列表
+        const {data:res} = await this.$http.get('roles');
+        if(res.meta.status !== 200) return;
+        this.allRoles = res.data;
       }
     },
     created(){

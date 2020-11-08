@@ -23,6 +23,15 @@ const routes = [
     },{
       path:'/users',
       component:() => import('components/user/Users'),
+    },{
+      path:'/rights',
+      component:() => import('components/power/PowerList'),
+    },{
+      path:'/roles',
+      component:() => import('components/power/Roles'),
+    },{
+      path:'/categories',
+      component:() => import('components/goods/Categories'),
     }]
   },
 ]

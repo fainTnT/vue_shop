@@ -13,3 +13,7 @@ html,body,#app{
 .el-cascader-menu {
   height: 300px !important;
 }
+
+.ql-editor{
+  min-height: 300px;
+}
